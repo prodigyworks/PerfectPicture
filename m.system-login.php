@@ -1,9 +1,10 @@
 <?php 
-	require_once("system-header.php"); 
+	require_once("system-embeddedheader.php"); 
 	require_once("confirmdialog.php");
 	
 	createConfirmDialog("loginDialog", "Forgot password ?", "forgotPassword");
 ?>
+<h1>MOBILE</h1>
 <style>
 	.content, .footer {
 		display: none;
@@ -21,13 +22,6 @@
 		font-style: italic;
 	}
 </style>
-<?php 
-	if (strpos($_SERVER['HTTP_USER_AGENT'], "iPhone")) {
-		echo "<h1>MOBILE</h1>";
-	}
-?>
-
-
 <!--  Start of content -->
 <p align="center">&nbsp;</p>
 <img src="images/login-page.png" />

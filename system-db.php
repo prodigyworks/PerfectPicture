@@ -470,13 +470,24 @@ function sendInternalUserMessage($id, $subject, $message, $footer = "", $attachm
 	if (!empty($error)) echo $error;
 }
 
-function createLazyCombo($id, $value, $name, $table, $where = " ", $required = true, $size = 40) {
+function createLazyCombo($id, $value, $name, $table, $where = " ", $required = true, $size = 40, $inputname = null) {
 	$qry = "SELECT A.$value AS id, A.$name AS value " .
 			"FROM $table A " .
 			$where . " ";
+			
+	if (! $inputname) {
+?>
+<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $id; ?>" value="" />
+<?php
+
+	} else {
+?>
+<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $inputname; ?>" value="" />
+<?php
+	}
+			
 ?>
 <input type="text" id="<?php echo $id; ?>_lazy" name="<?php echo $id; ?>_lazy" size="<?php echo $size; ?>" value="" />
-<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $id; ?>" value="" />
 <script>
 	$(document).ready(
 			function() {
@@ -669,6 +680,16 @@ function getEmailHeader() {
 
 function getEmailFooter() {
 	return getSiteConfigData()->emailfooter;
+}
+
+function getLoggedOnCustomerID() {
+	start_db();
+	
+	if (! isset($_SESSION['SESS_CUSTOMER_ID'])) {
+		return 0;
+	}
+	
+	return $_SESSION['SESS_CUSTOMER_ID'];
 }
 
 function getLoggedOnMemberID() {

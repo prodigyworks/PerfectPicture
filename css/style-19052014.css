@@ -6,6 +6,38 @@
 	border: 1px solid #CCCCCC;
 }
 
+#orderapp form {
+	padding:10px;
+}
+
+#orderform {
+	margin-top: 10px;
+}
+
+#orderform td input {
+	font-size:20px;
+}
+
+#orderform #submitbutton {
+	padding:15px;
+	font-size:24px;
+	margin-top: 14px;
+}
+
+#orderform .header td {
+	font-style: italic;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+#orderform td {
+	padding-top: 16px;
+}
+
+#orderform .favourite {
+	font-weight: bold;
+}
+
 .ui-autocomplete {
 	max-height:200px;
 	overflow:auto;
