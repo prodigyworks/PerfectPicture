@@ -244,7 +244,7 @@ function smtpmailer($to, $from, $from_name, $subject, $body, $attachments = arra
 		
 		$mail = new PHPMailer();  // create a new object
 		$mail->AddReplyTo($from, $from_name);
-		$mail->SetFrom("support@allegrotransport.com", $from_name);
+		$mail->SetFrom("office@jrm.com", $from_name);
 		$mail->IsHTML(true);
 		$mail->Subject = $subject;
 		$mail->Body = $body;
@@ -300,7 +300,7 @@ function sendRoleMessage($role, $subject, $message, $attachments = array()) {
 	//Check whether the query was successful or not
 	if($result) {
 		while (($member = mysql_fetch_assoc($result))) {
-			smtpmailer($member['email'], 'support@allegrotransport.com', 'Allegro Transport', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(), $attachments);
+			smtpmailer($member['email'], 'office@jrm.com', 'JRM Facility Services', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(), $attachments);
 			
 			$subject = mysql_escape_string($subject);
 			$message = mysql_escape_string($message);
@@ -315,10 +315,28 @@ function sendRoleMessage($role, $subject, $message, $attachments = array()) {
 	if (!empty($error)) echo $error;
 }
 
+function sendCustomerMessage($customerid, $subject, $message, $attachments = array()) {
+	$qry = "SELECT email1, firstname FROM {$_SESSION['DB_PREFIX']}customer " .
+			"WHERE id = $customerid";
+	$result = mysql_query($qry);
+
+	//Check whether the query was successful or not
+	if($result) {
+		while (($member = mysql_fetch_assoc($result))) {
+			smtpmailer($member['email1'], 'confirmation@jrm.com', 'JRM', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(), $attachments);
+		}
+		
+	} else {
+		logError($qry . " - " . mysql_error());
+	}
+	
+	if (!empty($error)) echo $error;
+}
+
 
 function sendInternalRoleMessage($role, $subject, $message, $attachments = array()) {
-	$from = "support@allegrotransport.com";
-	$fromName = "Allegro Transport";
+	$from = "office@jrm.com";
+	$fromName = "JRM Facility Services";
 	$qry = "SELECT B.email, B.firstname, B.lastname FROM {$_SESSION['DB_PREFIX']}members B " .
 			"WHERE B.member_id = " . getLoggedOnMemberID();
 	$result = mysql_query($qry);
@@ -370,7 +388,7 @@ function sendTeamMessage($id, $subject, $message, $footer = "") {
 	//Check whether the query was successful or not
 	if($result) {
 		while (($member = mysql_fetch_assoc($result))) {
-			smtpmailer($member['email'], 'support@allegrotransport.com', 'Allegro Transport', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(). $footer);
+			smtpmailer($member['email'], 'office@jrm.com', 'JRM Facility Services', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(). $footer);
 			
 			$subject = mysql_escape_string($subject);
 			$message = mysql_escape_string($message);
@@ -403,7 +421,7 @@ function sendUserMessage($id, $subject, $message, $footer = "", $attachments = a
 	//Check whether the query was successful or not
 	if($result) {
 		while (($member = mysql_fetch_assoc($result))) {
-			smtpmailer($member['email'], 'support@allegrotransport.com', 'Allegro Transport', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(). $footer, $attachments);
+			smtpmailer($member['email'], 'office@jrm.com', 'JRM Facility Services', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(). $footer, $attachments);
 				
 			$subject = mysql_escape_string($subject);
 			$message = mysql_escape_string($message);
@@ -434,8 +452,8 @@ function addAuditLog($table, $type, $id) {
 }
 
 function sendInternalUserMessage($id, $subject, $message, $footer = "", $attachments = array(), $action = "") {
-	$from = "support@allegrotransport.com";
-	$fromName = "Allegro Transport";
+	$from = "office@jrm.com";
+	$fromName = "JRM Facility Services";
 	$qry = "SELECT B.email, B.firstname, B.lastname FROM {$_SESSION['DB_PREFIX']}members B " .
 			"WHERE B.member_id = " . getLoggedOnMemberID();
 	$result = mysql_query($qry);

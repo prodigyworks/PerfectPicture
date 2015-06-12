@@ -7,31 +7,31 @@
 }
 
 #orderapp form {
-	padding:10px;
+	padding:2px;
 }
 
 #orderform {
-	margin-top: 10px;
+	margin-top: 2px;
 }
 
 #orderform td input {
-	font-size:20px;
+	font-size:10px;
 }
 
 #orderform #submitbutton {
 	padding:15px;
-	font-size:24px;
+	font-size:14px;
 	margin-top: 14px;
 }
 
 #orderform .header td {
 	font-style: italic;
 	font-weight: bold;
-	font-size: 20px;
+	font-size: 10px;
 }
 
 #orderform td {
-	padding-top: 16px;
+	padding-top: 3px;
 }
 
 #orderform .favourite {
@@ -1469,8 +1469,6 @@ iframe {
 }
 
 .embeddedpage {
-	width: 100%;
-	height: 600px;
 	text-align: left;
 	background-color: #f1f1f1 ;
 }

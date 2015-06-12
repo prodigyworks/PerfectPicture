@@ -108,4 +108,4 @@
 		?>
 <!--  End of content -->
 
-<?php include("system-footer.php"); ?>					
+<?php include("system-embeddedfooter.php"); ?>					

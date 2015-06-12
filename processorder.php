@@ -1,9 +1,26 @@
 <?php 
-	include("system-embeddedheader.php"); 
-?>
-	<div class="header">Order</div>
-<?php
+	include("system-db.php"); 
+	
+	start_db();
+
 	$customerid = getLoggedOnCustomerID();
+	
+	$sql = "INSERT INTO {$_SESSION['DB_PREFIX']}order 
+			(
+				customerid, orderdate, status
+			)
+			VALUES
+			(
+				$customerid, CURDATE(), 0
+			)";
+				
+	$result = mysql_query($sql);
+
+	if (! $result) {
+		logError($sql . " = " . mysql_error());
+	}
+	
+	$orderid = mysql_insert_id();
 	
 	for ($row = 0; $row < count($_POST['productid']); $row++) {
 		$productid = $_POST['productid'][$row];
@@ -39,11 +56,27 @@
 		} else if (! $result) {
 			logError($sql . " = " . mysql_error());
 		}
+		
+		$sql = "INSERT INTO {$_SESSION['DB_PREFIX']}orderitem
+				(
+					orderid, productid, quantity
+				)
+				VALUES
+				(
+					$orderid, $productid, $qty
+				)";
+					
+		$result = mysql_query($sql);
+	
+		if (! $result) {
+			logError($sql . " = " . mysql_error());
+		}
 	}
+	
+	mysql_query("COMMIT");
+	
+	sendRoleMessage("JRM", "Confirmed order", "Confirmed order ........");
+	sendCustomerMessage($customerid, "Confirmed customer order", "Confirmed order ........");
+	
+	header("location: processorderconfirm.php?orderid=$orderid");
 ?>
-<br>
-<h2>Order <?php echo $orderid; ?> has been processed.</h2>
-<?php
-	include("system-embeddedfooter.php"); 
-?>
-
