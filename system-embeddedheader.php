@@ -11,7 +11,7 @@
 		exit();
 	}
 	
-	if (! isset($_SESSION['SESS_CLIENT_ID']) && ! endsWith($_SERVER['PHP_SELF'], "system-client.php")) {
+	if (! isset($_SESSION['SESS_CLIENT_ID']) && (! endsWith($_SERVER['PHP_SELF'], "system-client.php") && ! endsWith($_SERVER['PHP_SELF'], "system-login.php"))) {
 		header("location: system-client.php");
 		exit();
 	}

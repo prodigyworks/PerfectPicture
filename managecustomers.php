@@ -98,6 +98,14 @@
 				'label' 	 => 'Name'
 			),
 			array(
+				'name'       => 'imageid',
+				'type'		 => 'IMAGE',
+				'required'   => false,
+				'length' 	 => 35,
+				'showInView' => false,
+				'label' 	 => 'Logo'
+			),			
+			array(
 				'name'       => 'firstname',
 				'length' 	 => 15,
 				'label' 	 => 'First Name'

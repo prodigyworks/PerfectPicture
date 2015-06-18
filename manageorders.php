@@ -398,6 +398,10 @@
 				window.open("orderreport.php?id=" + id);
 			}
 			
+			function printDelivery(id) {
+				window.open("deliveryreport.php?id=" + id);
+			}
+			
 			function populateTable(data) {
 				var total = 0;
 				var html = "<TABLE width='100%' class='grid list'><THEAD><?php createHeader(); ?></THEAD>";
@@ -825,9 +829,14 @@
 				'script' 	  => 'undo'
 			),
 			array(
-				'title'		  => 'Print',
+				'title'		  => 'Order Acknowledgement',
 				'imageurl'	  => 'images/print.png',
 				'script' 	  => 'printOrder'
+			),
+			array(
+				'title'		  => 'Delivery Note',
+				'imageurl'	  => 'images/print.png',
+				'script' 	  => 'printDelivery'
 			)
 		);
 		

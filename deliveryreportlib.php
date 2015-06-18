@@ -3,21 +3,30 @@
 	require_once('pdfreport.php');
 	require_once("simple_html_dom.php");
 	
-	class OrderReport extends PDFReport {
+	class DeliveryReport extends PDFReport {
 		private $headermember = null;
 		
 		function newPage() {
 			$this->AddPage();
 			
-			$this->Image("images/logomain.png", 135.6, 10);
+			$this->DynamicImage($this->headermember['imageid'], 135.6, 10);
+//			$this->Image("images/logomain.png", 135.6, 10);
 			
-			$this->addText( 15, 13, "JRM Facility Services Ltd", 12, 4, 'B') + 5;
-			$this->addText(15, 20, getSiteConfigData()->address, 8, 3) + 9.5;
+			$this->addText( 15, 13, $this->headermember['customername'], 12, 4, 'B') + 5;
+			
+			if (trim($this->headermember['customeraddress1']) != "") $customeraddress .= $this->headermember['customeraddress1'] . "\n";
+			if (trim($this->headermember['customeraddress2']) != "") $customeraddress .= $this->headermember['customeraddress2'] . "\n";
+			if (trim($this->headermember['customeraddress3']) != "") $customeraddress .= $this->headermember['customeraddress3'] . "\n";
+			if (trim($this->headermember['customercity']) != "") $customeraddress .= $this->headermember['customercity'] . "\n";
+			if (trim($this->headermember['customerpostcode']) != "") $customeraddress .= $this->headermember['customerpostcode'] . "\n";
+			
+			
+			$this->addText(15, 20, $customeraddress, 8, 3) + 9.5;
 			$dynamicY = 47.5;
 			
 			$this->addText( 15, $dynamicY, "Customer Name & Address", 8, 3, 'B');
 			$this->addText( 75, $dynamicY, "Delivery Address", 8, 3, 'B');
-			$this->addText( 150, $dynamicY, "ORDER ACKNOWLEDGEMENT", 8, 3, 'B');
+			$this->addText( 160, $dynamicY, "DELIVERY NOTE", 8, 3, 'B');
 			
 			$this->addText( 145, $dynamicY + 5, "FAO:", 8, 3, 'B');
 			$this->addText( 170, $dynamicY + 5, $this->headermember['firstname'] . " " . $this->headermember['lastname'], 8, 2.4, '', 30);
@@ -60,15 +69,9 @@
 			$this->RoundedRect(143, 46, 58, 38, 5, '1234', 'BD');
 			$this->Line(143, 51.5, 201, 51.5);
 			$this->Line(143, 77, 201, 77);
-			$this->Line(161, 234, 200, 234);
-			$this->Line(161, 240, 200, 240);
-			$this->Line(161, 246, 200, 246);
-			$this->Line(161, 252, 200, 252);
-			$this->Line(161, 258, 200, 258);
-			$this->Line(161, 264, 200, 264);
 			
 			if ($this->headermember['revision'] != 1) {
-				$this->addText(55, $dynamicY + 38, "This is Order Revision No " . $this->headermember['revision'] . " and Supersedes all Previous Issues", 8, 3.5, 'B');
+				$this->addText(55, $dynamicY + 38, "This is Delivery Note No " . $this->headermember['revision'] . " and Supersedes all Previous Issues", 8, 3.5, 'B');
 			}
 			
 			$this->addText( 10, 270, "VAT Registration No: XXX XXXX XX\nCompany Reg No: XXXXXXXX", 7, 3);
@@ -79,18 +82,14 @@
 				
 			$cols=array( "Quantity"    => 18,
 			             "Code"  => 28,		
-						 "Description"  => 105,
-			             "Price Each"  => 19.5,
-			             "Line Total"  => 19.5
+						 "Description"  => 144
 				);
 		
 			$this->addCols( $dynamicY + 45, $cols);
 			
 			$cols=array( "Quantity"    => "L",
 			             "Code"  => "L",		
-						 "Description"  => "L",
-			             "Price Each"  => "R",
-			             "Line Total"  => "R"
+						 "Description"  => "L"
 				);
 			$this->addLineFormat( $cols);
 			
@@ -106,9 +105,13 @@
 			
 			try {
 				$sql = "SELECT A.*, DATE_FORMAT(A.orderdate, '%d/%m/%Y') AS orderdate,
-						C.name AS clientname, D.name AS customername, D.accountnumber, D.invoiceaddress1, D.invoiceaddress2, D.invoiceaddress3, 
-						D.invoicecity, D.invoicepostcode, B.deliveryaddress1, B.deliveryaddress2, 
-						B.deliveryaddress3, B.deliverycity, B.deliverypostcode, D.firstname, B.lastname,
+						C.name AS clientname, D.name AS customername, D.imageid, D.accountnumber, 
+						C.invoiceaddress1, C.invoiceaddress2, C.invoiceaddress3,  C.invoicecity, C.invoicepostcode, 
+						D.invoiceaddress1 AS customeraddress1, D.invoiceaddress2 AS customeraddress2, 
+						D.invoiceaddress3 AS customeraddress3, D.invoicecity AS customercity, 
+						D.invoicepostcode AS customerpostcode, 
+						B.deliveryaddress1, B.deliveryaddress2, 
+						B.deliveryaddress3, B.deliverycity, B.deliverypostcode, C.firstname, C.lastname,
 						E.fullname AS takenbyname
 					    FROM  {$_SESSION['DB_PREFIX']}order A
 					    INNER JOIN  {$_SESSION['DB_PREFIX']}customerclientsite B
@@ -143,9 +146,7 @@
 								$line = array( 
 										 "Quantity"    => $itemmember['quantity'],
 							             "Code"  => $itemmember['productcode'],		
-										 "Description"  => $itemmember['description'],
-							             "Price Each"  => number_format($itemmember['priceeach'], 2),
-							             "Line Total"  => number_format(($itemmember['priceeach'] * $itemmember['quantity']), 2)
+										 "Description"  => $itemmember['description']
 							         );
 								             
 								$size = $this->addLine( $dynamicY, $line );
@@ -165,59 +166,6 @@
 							logError($qry . " - " . mysql_error());
 						}
 						
-						$line = array( 
-								 "Quantity"    => " ",
-					             "Code"  => " ",		
-								 "Description"  => " " ,
-					             "Price Each"  => "Goods Net:",
-					             "Line Total"  => number_format($total, 2)
-					         );
-						             
-						$size = $this->addLine( 236, $line );
-						
-						$line = array( 
-								 "Quantity"    => " ",
-					             "Code"  => " ",		
-								 "Description"  => " " ,
-					             "Price Each"  => "Delivery:",
-								 "Line Total"  => number_format($shipping, 2)
-					         );
-						             
-						$size = $this->addLine( 242, $line );
-						
-						$line = array( 
-								 "Quantity"    => " ",
-					             "Code"  => " ",		
-								 "Description"  => " " ,
-					             "Price Each"  => "Order Net:",
-								 "Line Total"  => number_format($shipping + $total, 2)
-					         );
-						             
-						$size = $this->addLine( 248, $line );
-						$totalvat += ($shipping * (getSiteConfigData()->vatrate / 100));
-						
-						$line = array( 
-								 "Quantity"    => " ",
-					             "Code"  => " ",		
-								 "Description"  => " " ,
-					             "Price Each"  => "VAT:",
-								 "Line Total"  => number_format($totalvat, 2)
-					         );
-						             
-						$size = $this->addLine( 254, $line );
-						
-						$line = array( 
-								 "Quantity"    => " ",
-					             "Code"  => " ",		
-								 "Description"  => " " ,
-					             "Price Each"  => "Total:",
-								 "Line Total"  => number_format(($totalvat + $shipping + $total) - $discount, 2)
-					         );
-						             
-						$size = $this->addLine( 260, $line );
-						
-
-						$this->addText( 162, 265, "Pounds Sterling", 6, 3);
 					}
 					
 				} else {
