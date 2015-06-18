@@ -40,7 +40,9 @@
 }
 
 .ui-autocomplete li a {
-	font-size: 8px ! important;
+	font-size: 11px ! important;
+	line-height: 11px ! important;
+    padding-top:2px ! important;
 }	
 
 .ui-autocomplete li a:hover
@@ -48,8 +50,6 @@
     color:White ! important;
     background:#96B202 ! important;
     outline:none ! important;
-    padding-left:2px ! important;
-    padding-right:2px ! important;
 }
 
 .ui-state-focus
@@ -65,7 +65,7 @@
 }
 
 html, body {
-	max-width: 320px;
+	max-width: 375px;
 }
 
 #loginForm {
@@ -104,7 +104,11 @@ input[readonly], textarea[readonly], select[readonly] {
 .logout {
 	text-align:right;
 	position: absolute;
-	width:320px;
+	width:375px;
 	font-size:10px;
 	top: 0px;
+}
+
+#loginForm {
+	padding:5px;
 }

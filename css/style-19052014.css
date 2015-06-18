@@ -1,5 +1,9 @@
 /* TAGS */
 
+.entryformclass {
+	background: white;
+}
+
 #divtable {
 	overflow: auto;
 	height:155px;
@@ -812,8 +816,8 @@ h4 {
 }
 
 .breadcrumb  {
-	width: 300px;
-	margin-left: 700px;
+	width: 500px;
+	margin-left: 500px;
 	text-align: right;
 	z-index: 60;
 	position: absolute;
@@ -1112,8 +1116,8 @@ h4 {
 
 .grid>thead td,.grid tfoot td {
 	height: 20px;
-	background: url(images/ui-bg_highlight-soft_15_cc0000_1x100.png) #dfeffc repeat-x 50% 50%;
-	color: white;
+	background: url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) #dfeffc repeat-x 50% 50%;
+	color: black;
 	font-weight: bold;
 	font-size: 12px;
 	padding: 2px;
@@ -1421,6 +1425,10 @@ form label {
 
 .ui-widget {
 	font-size: 11px ! important;
+}
+
+.ui-dialog-content {
+	background: white ! important;
 }
 
 .content {

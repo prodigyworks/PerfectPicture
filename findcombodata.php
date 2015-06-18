@@ -17,6 +17,10 @@
 		$qry .= " HAVING $name like '%" . $_GET['term'] .  "%' ";
 	}
 	
+	if (isset($_GET['where'])) {
+		$qry .= $_GET['where'];
+	}
+	
 	$qry .= " ORDER BY $name";
 	$qry .= " LIMIT 50";
 	

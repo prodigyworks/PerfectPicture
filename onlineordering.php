@@ -1,18 +1,18 @@
 <?php include("system-embeddedheader.php"); ?>
 <div id="orderapp">
 	<form id="orderform" method="POST" action="processorder.php">
-		<table width='320px' cellspacing=0 cellpadding=0>
+		<table width='100%' cellspacing=0 cellpadding=0>
 			<tr class="header">
 				<td>Product</td>
 				<td>Qty</td>
 			</tr>
 <?php 
-	$customerid = getLoggedOnCustomerID();
+	$siteid = getLoggedOnSiteID();
 	$sql = "SELECT A.*, B.description 
 			FROM {$_SESSION['DB_PREFIX']}frequentproducts A
 			INNER JOIN {$_SESSION['DB_PREFIX']}product B 
 			ON B.id = A.productid 
-			WHERE customerid = $customerid 
+			WHERE siteid = $siteid 
 			ORDER BY A.frequency DESC 
 			LIMIT 20";
 	
@@ -44,7 +44,7 @@
 ?>
 			<tr>
 				<td>
-					<?php createLazyCombo("productid" . $row, "id", "description", "{$_SESSION['DB_PREFIX']}product", "", false, 50	, "productid[]"); ?>
+					<?php createLazyCombo("productid" . $row, "id", "description", "{$_SESSION['DB_PREFIX']}product", "", false, 55	, "productid[]"); ?>
 				</td>
 				<td>
 					<input type="number" id="qty" name="qty[]" value="" size=5  style="width:40px" />

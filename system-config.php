@@ -112,24 +112,6 @@
 	    	if (isAuthenticated()) {
 		    	if (isset($_SESSION['lastconnectiontime'])) {
 		    		$lastsessiontime = time() - $_SESSION['lastconnectiontime'];
-		    		
-		    		/* 30 minutes. */
-		    		if (DEV_ENV != "true") {
-			    		if ($lastsessiontime >= 36000) {	//Unset the variables stored in session
-							unset($_SESSION['SESS_MEMBER_ID']);
-							unset($_SESSION['SESS_FIRST_NAME']);
-							unset($_SESSION['SESS_LAST_NAME']);
-							unset($_SESSION['ROLES']);
-							unset($_SESSION['MENU_CACHE']);
-	//						unset($_SESSION['ERRMSG_ARR']);
-	
-							$_SESSION['ROLES'] = array();
-							$_SESSION['ROLES'][0] = "PUBLIC";
-							$_SESSION['ROLES'][1] = "UNAUTHENTICATED";
-		
-			    			header("location: system-login.php?session=" . urlencode(base64_encode("index.php")));
-			    		}
-		    		}
 		    	}
 	    	}
 	    	

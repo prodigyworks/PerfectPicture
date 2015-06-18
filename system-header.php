@@ -5,9 +5,11 @@
 		session_start();
 	}
 	
-	if (! isAuthenticated() && ! endsWith($_SERVER['PHP_SELF'], "/system-login.php")) {
-		header("location: system-login.php?session=" . urlencode(base64_encode($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] )));
-		exit();
+	if (! isAuthenticated()) {
+		if (! endsWith($_SERVER['PHP_SELF'], "/system-login.php")) {
+			header("location: system-login.php?session=" . urlencode(base64_encode($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] )));
+			exit();
+		}
 	}
 	
 	function showBreadCrumb() {
@@ -28,7 +30,10 @@
 <link rel="shortcut icon" href="favicon.ico">
 
 <link href="css/style-19052014.css" rel="stylesheet" type="text/css" />
+<!-- 
 <link href="css/jquery-ui-1.10.3.custom.css" rel="stylesheet" type="text/css" />
+ -->
+<link href="css/jquery-ui.css" rel="stylesheet" type="text/css" />
 <link href="css/dcmegamenu.css" rel="stylesheet" type="text/css" />
 <link href="css/skins/white.css" rel="stylesheet" type="text/css" />
 

@@ -5,10 +5,17 @@
 		session_start();
 	}
 	
-	if (! isAuthenticated() && ! endsWith($_SERVER['PHP_SELF'], "/m.system-login.php")) {
+	if (! isAuthenticated() && ! endsWith($_SERVER['PHP_SELF'], "system-login.php")) {
+		
 		header("location: m.system-login.php?session=" . urlencode(base64_encode($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] )));
 		exit();
 	}
+	
+	if (! isset($_SESSION['SESS_CLIENT_ID']) && ! endsWith($_SERVER['PHP_SELF'], "system-client.php")) {
+		header("location: system-client.php");
+		exit();
+	}
+	
 ?>
 <?php 
 	//Include database connection details
@@ -26,7 +33,10 @@
 <link rel="shortcut icon" href="favicon.ico">
 
 <link href="css/m.style.css" rel="stylesheet" type="text/css" />
+<!-- 
 <link href="css/jquery-ui-1.10.3.custom.css" rel="stylesheet" type="text/css" />
+ -->
+<link href="css/jquery-ui.css" rel="stylesheet" type="text/css" />
 <link href="css/dcmegamenu.css" rel="stylesheet" type="text/css" />
 <link href="css/skins/white.css" rel="stylesheet" type="text/css" />
 
@@ -64,10 +74,10 @@
 					<a href="system-logout.php">Log Out</a>
 				</div>
 				
-				<div style="width:320px; text-align:center">
+				<div style="width:375px; text-align:center">
 					<img height=40 src="images/logomain2.png"/>
 				</div>
-				<div style="width:320px;text-align:center">
+				<div style="width:375px;text-align:center">
 					<h5><?php echo $_SESSION['SESS_CUSTOMER_NAME']; ?></h5>
 				</div>
 				<hr>

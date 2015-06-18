@@ -8,8 +8,7 @@ class SiteConfigClass {
 	public $runscheduledays;
 	public $address;
 	public $bookingprefix;
-	public $productcodeprefix;
-	public $productgroupprefix;
+	public $invoiceprefix;
 }
 
 function start_db() {
@@ -68,8 +67,7 @@ function start_db() {
 					$data->runscheduledays = $member['runscheduledays'];
 					$data->address = $member['address'];
 					$data->bookingprefix = $member['bookingprefix'];
-					$data->productcodeprefix = $member['productcodeprefix'];
-					$data->productgroupprefix = $member['productgroupprefix'];
+					$data->invoiceprefix = $member['invoiceprefix'];
 					
 					$_SESSION['SITE_CONFIG'] = $data;
 				}
@@ -316,14 +314,33 @@ function sendRoleMessage($role, $subject, $message, $attachments = array()) {
 }
 
 function sendCustomerMessage($customerid, $subject, $message, $attachments = array()) {
-	$qry = "SELECT email1, firstname FROM {$_SESSION['DB_PREFIX']}customer " .
+	$qry = "SELECT email, firstname FROM {$_SESSION['DB_PREFIX']}customer " .
 			"WHERE id = $customerid";
 	$result = mysql_query($qry);
 
 	//Check whether the query was successful or not
 	if($result) {
 		while (($member = mysql_fetch_assoc($result))) {
-			smtpmailer($member['email1'], 'confirmation@jrm.com', 'JRM', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(), $attachments);
+			smtpmailer($member['email'], 'confirmation@jrm.com', 'JRM', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(), $attachments);
+		}
+		
+	} else {
+		logError($qry . " - " . mysql_error());
+	}
+	
+	if (!empty($error)) echo $error;
+}
+
+
+function sendSiteMessage($siteid, $subject, $message, $attachments = array()) {
+	$qry = "SELECT email, firstname FROM {$_SESSION['DB_PREFIX']}customerclientsite " .
+			"WHERE id = $siteid";
+	$result = mysql_query($qry);
+
+	//Check whether the query was successful or not
+	if($result) {
+		while (($member = mysql_fetch_assoc($result))) {
+			smtpmailer($member['email'], 'confirmation@jrm.com', 'JRM', $subject, getEmailHeader() . "<h4>Dear " . $member['firstname'] . ",</h4><p>" . $message . "</p>" . getEmailFooter(), $attachments);
 		}
 		
 	} else {
@@ -492,18 +509,6 @@ function createLazyCombo($id, $value, $name, $table, $where = " ", $required = t
 	$qry = "SELECT A.$value AS id, A.$name AS value " .
 			"FROM $table A " .
 			$where . " ";
-			
-	if (! $inputname) {
-?>
-<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $id; ?>" value="" />
-<?php
-
-	} else {
-?>
-<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $inputname; ?>" value="" />
-<?php
-	}
-			
 ?>
 <input type="text" id="<?php echo $id; ?>_lazy" name="<?php echo $id; ?>_lazy" size="<?php echo $size; ?>" value="" />
 <script>
@@ -520,6 +525,17 @@ function createLazyCombo($id, $value, $name, $table, $where = " ", $required = t
 		);
 </script>
 <?php
+			
+	if (! $inputname) {
+?>
+<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $id; ?>" value="" />
+<?php
+
+	} else {
+?>
+<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $inputname; ?>" value="" />
+<?php
+	}
 }
 
 function createCombo($id, $value, $name, $table, $where = " ", $required = true, $isarray = false, $attributeArray = array(), $blank = true) {
@@ -708,6 +724,27 @@ function getLoggedOnCustomerID() {
 	}
 	
 	return $_SESSION['SESS_CUSTOMER_ID'];
+}
+
+function getLoggedOnClientID() {
+	start_db();
+	
+	if (! isset($_SESSION['SESS_CLIENT_ID'])) {
+		return 0;
+	}
+	
+	return $_SESSION['SESS_CLIENT_ID'];
+}
+
+
+function getLoggedOnSiteID() {
+	start_db();
+	
+	if (! isset($_SESSION['SESS_CLIENT_SITE_ID'])) {
+		return 0;
+	}
+	
+	return $_SESSION['SESS_CLIENT_SITE_ID'];
 }
 
 function getLoggedOnMemberID() {
@@ -908,6 +945,9 @@ function login($login, $password, $redirect = true) {
 			$_SESSION['SESS_LAST_NAME'] = $member['lastname'];
 			$_SESSION['SESS_CUSTOMER_ID'] = $member['customerid'];
 			$_SESSION['SESS_CUSTOMER_NAME'] = $member['name'];
+			
+			unset($_SESSION['SESS_CLIENT_ID']);
+			unset($_SESSION['SESS_CLIENT_SITE_ID']);
 			
 			$qry = "SELECT * FROM {$_SESSION['DB_PREFIX']}userroles WHERE memberid = " . $_SESSION['SESS_MEMBER_ID'] . "";
 			$result=mysql_query($qry);

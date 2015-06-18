@@ -11,8 +11,7 @@
 		$emailfooter = mysql_escape_string($_POST['emailfooter']);
 		$address = mysql_escape_string($_POST['address']);
 		$bookingprefix = $_POST['bookingprefix'];
-		$productcodeprefix = $_POST['productcodeprefix'];
-		$productgroupprefix = $_POST['productgroupprefix'];
+		$invoiceprefix = $_POST['invoiceprefix'];
 		$vatrate = $_POST['vatrate'];
 		
 		$qry = "UPDATE {$_SESSION['DB_PREFIX']}siteconfig SET " .
@@ -20,8 +19,7 @@
 				"vatrate = $vatrate, " .
 				"address = '$address', " .
 				"bookingprefix = '$bookingprefix', " .
-				"productcodeprefix = '$productcodeprefix', " .
-				"productgroupprefix = '$productgroupprefix', " .
+				"invoiceprefix = '$invoiceprefix', " .
 				"runscheduledays = '$runscheduledays', " .
 				"emailfooter = '$emailfooter', metamodifieddate = NOW(), metamodifieduserid = " . getLoggedOnMemberID() . "";
 		$result = mysql_query($qry);
@@ -58,14 +56,11 @@
 	<label>Address</label>
 	<textarea id="address" name="address" rows="5" cols="60"></textarea>
 
-	<label>Quotation Prefix</label>
+	<label>Order Prefix</label>
 	<input type="text" id="bookingprefix" name="bookingprefix" value="<?php echo $member['bookingprefix']; ?>" />
 
-	<label>Product Code Prefix</label>
-	<input type="text" id="productcodeprefix" name="productcodeprefix" value="<?php echo $member['productcodeprefix']; ?>" />
-
-	<label>Product Group Prefix</label>
-	<input type="text" id="productgroupprefix" name="productgroupprefix" value="<?php echo $member['productgroupprefix']; ?>" />
+	<label>Invoice Prefix</label>
+	<input type="text" id="invoiceprefix" name="invoiceprefix" value="<?php echo $member['invoiceprefix']; ?>" />
 	
 	<br>
 	<br>

@@ -6,15 +6,21 @@
 <table width="100%" cellpadding="0" cellspacing="4" class="entryformclass">
 	<tbody>
 		<tr valign="center">
-			<td>Customer</td>
+			<td>Company</td>
 			<td colspan=2>
-				<?php createLazyCombo("customerid", "id", "name", "{$_SESSION['DB_PREFIX']}customer", "", true, 80); ?>
+				<?php createCombo("customerid", "id", "name", "{$_SESSION['DB_PREFIX']}customer", "", true); ?>
 			</td>
 		</tr>
 		<tr valign="center">
-			<td>Account Code</td>
+			<td>Client</td>
 			<td colspan=2>
-				<input type="text" id="accountcode" name="accountcode" size="9" readonly  />
+				<?php createCombo("clientid", "id", "name", "{$_SESSION['DB_PREFIX']}customerclient", "", true); ?>
+			</td>
+		</tr>
+		<tr valign="center">
+			<td>Site</td>
+			<td colspan=2>
+				<?php createCombo("siteid", "id", "name", "{$_SESSION['DB_PREFIX']}customerclientsite", "", true); ?>
 			</td>
 		</tr>
 		<tr valign="center">
@@ -36,15 +42,9 @@
 			</td>
 		</tr>
 		<tr valign="center">
-			<td>Quotation Date</td>
+			<td>Order Date</td>
 			<td colspan=2>
 				<input type="text" class="datepicker" id="orderdate" name="orderdate">
-			</td>
-		</tr>
-		<tr valign="center">
-			<td>Your Reference</td>
-			<td colspan=2>
-				<input type="text" style="width:260px" id="yourordernumber" name="yourordernumber">
 			</td>
 		</tr>
 		<tr valign="center">
@@ -117,7 +117,7 @@ function createHeader() {
 	<table width="100%" cellpadding="0" cellspacing="4" class="entryformclass">
 		<tbody>
 			<tr valign="center">
-				<td width='120px'>Product</td>
+				<td>Product</td>
 				<td>
 					<?php createLazyCombo("item_productid", "id", "description", "{$_SESSION['DB_PREFIX']}product", "", true, 80); ?>
 				</td>

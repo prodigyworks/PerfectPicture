@@ -78,11 +78,6 @@
 				'title'		  => 'Documents',
 				'imageurl'	  => 'images/document.gif',
 				'script' 	  => 'editDocuments'
-			),
-			array(
-				'title'		  => 'Price Breaks',
-				'imageurl'	  => 'images/document.gif',
-				'application' => 'managepricebreaks.php'
 			)
 		);
 		

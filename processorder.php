@@ -3,15 +3,16 @@
 	
 	start_db();
 
-	$customerid = getLoggedOnCustomerID();
+	$siteid = getLoggedOnSiteID();
+	$takenbyid = getLoggedOnMemberID();
 	
 	$sql = "INSERT INTO {$_SESSION['DB_PREFIX']}order 
 			(
-				customerid, orderdate, status
+				siteid, orderdate, status, revision, takenbyid
 			)
 			VALUES
 			(
-				$customerid, CURDATE(), 0
+				$siteid, CURDATE(), 0, 1, $takenbyid
 			)";
 				
 	$result = mysql_query($sql);
@@ -32,11 +33,11 @@
 		
 		$sql = "INSERT INTO {$_SESSION['DB_PREFIX']}frequentproducts 
 				(
-					customerid, productid, frequency
+					siteid, productid, frequency
 				)
 				VALUES
 				(
-					$customerid, $productid, $qty
+					$siteid, $productid, $qty
 				)";
 					
 		$result = mysql_query($sql);
@@ -44,7 +45,7 @@
 		if (mysql_errno() == 1062) {
 			$sql = "UPDATE {$_SESSION['DB_PREFIX']}frequentproducts SET
 					frequency = frequency + $qty
-					WHERE customerid = $customerid
+					WHERE siteid = $siteid
 					AND productid = $productid";
 			
 			$result = mysql_query($sql);
@@ -76,7 +77,7 @@
 	mysql_query("COMMIT");
 	
 	sendRoleMessage("JRM", "Confirmed order", "Confirmed order ........");
-	sendCustomerMessage($customerid, "Confirmed customer order", "Confirmed order ........");
+	sendSiteMessage($siteid, "Confirmed customer order", "Confirmed order ........");
 	
 	header("location: processorderconfirm.php?orderid=$orderid");
 ?>

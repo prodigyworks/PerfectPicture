@@ -3,10 +3,41 @@
 	
 	function accept() {
 		$id = $_POST['orderid'];
+		$memberid = getLoggedOnMemberID();
 		$sql = "UPDATE {$_SESSION['DB_PREFIX']}order SET
 				status = 1,
 				converteddatetime = NOW()
 				WHERE id = $id";
+		$result = mysql_query($sql);
+			
+		if (! $result) {
+			logError($sql . " - " . mysql_error());
+		}
+		
+		$sql = "INSERT INTO {$_SESSION['DB_PREFIX']}invoice
+				(
+					siteid, revision, invoicedate, orderid, status, takenbyid, deliverycharge, discount, total
+				)
+				SELECT 
+					siteid, revision, CURDATE(), id, 0, $memberid, deliverycharge, discount, total
+					FROM {$_SESSION['DB_PREFIX']}order
+					WHERE id = $id";
+		$result = mysql_query($sql);
+			
+		if (! $result) {
+			logError($sql . " - " . mysql_error());
+		}
+		
+		$invoiceid = mysql_insert_id();
+		
+		$sql = "INSERT INTO {$_SESSION['DB_PREFIX']}invoiceitem
+				(
+					invoiceid, productid, priceeach, quantity, linetotal, vat, vatrate
+				)
+				SELECT 
+					$invoiceid, productid, priceeach, quantity, linetotal, vat, vatrate
+					FROM {$_SESSION['DB_PREFIX']}orderitem
+					WHERE orderid = $id";
 		$result = mysql_query($sql);
 			
 		if (! $result) {
@@ -31,7 +62,7 @@
 		
 		/* Post header event. */
 		public function postHeaderEvent() {
-			createConfirmDialog("confirmacceptdialog", "Confirm acceptance ?", "confirmaccept");
+			createConfirmDialog("confirmacceptdialog", "Confirm invoice ?", "confirmaccept");
 			createConfirmDialog("confirmundodialog", "Confirm undo ?", "confirmundo");
 			createConfirmDialog("confirmRemoveDialog", "Confirm removal ?", "confirmRemoval");
 			createDocumentLink();
@@ -129,6 +160,8 @@
 		
 		public function postAddScriptEvent() {
 ?>
+			$("#customerid").val("").trigger("change");
+			$("#clientid").val("").trigger("change");
 			$("#crudaddbutton").show();
 			$("#revision").val("1");
 			$("#deliverycharge").val("0.00");
@@ -144,7 +177,7 @@
 		}
 		
 		public function postEditScriptEvent() {
-			$this->showQuote(false);
+			$this->showOrder(false);
 ?>
 			$("#invoiceitemdialog input, #invoiceitemdialog select").removeAttr("disabled");
 			$("#crudaddbutton").show();
@@ -152,51 +185,18 @@
 		}
 		
 		public function postViewScriptEvent() {
-			$this->showQuote(true);
+			$this->showOrder(true);
 ?>
 			$("#invoiceitemdialog input, #invoiceitemdialog select").attr("disabled", true);
 			$("#crudaddbutton").hide();
 <?php 			
 		}
 		
-		public function showQuote($readonly) {
+		public function showOrder($readonly) {
 ?>
 			$("#revision").val(parseInt($("#revision").val()) + 1);
-
-				callAjax(
-						"finddata.php", 
-						{ 
-							sql: "SELECT A.*, B.discount FROM <?php echo $_SESSION['DB_PREFIX'];?>customer A LEFT OUTER JOIN <?php echo $_SESSION['DB_PREFIX'];?>discountband B ON B.id = A.discountbandid WHERE A.id = " + $("#customerid").val()
-						},
-						function(data) {
-							if (data.length > 0) {
-								var node = data[0];
-								var invoiceaddress = "";
-								var deliveryaddress = "";
-								
-								if (node.deliveryaddress1 != "") deliveryaddress += node.deliveryaddress1+ "\n";
-								if (node.deliveryaddress2!= "") deliveryaddress += node.deliveryaddress2+ "\n";
-								if (node.deliveryaddress3!= "") deliveryaddress += node.deliveryaddress3+ "\n";
-								if (node.deliverycity!= "") deliveryaddress += node.deliverycity+ "\n";
-								if (node.deliverypostcode!= "") deliveryaddress += node.deliverypostcode+ "\n";
-								
-								if (node.invoiceaddress1!= "") invoiceaddress += node.invoiceaddress1+ "\n";
-								if (node.invoiceaddress2!= "") invoiceaddress += node.invoiceaddress2+ "\n";
-								if (node.invoiceaddress3!= "") invoiceaddress += node.invoiceaddress3+ "\n";
-								if (node.invoicecity!= "") invoiceaddress += node.invoicecity+ "\n";
-								if (node.invoicepostcode!= "") invoiceaddress += node.invoicepostcode+ "\n";
-								
-								if (deliveryaddress == "") {
-									deliveryaddress = invoiceaddress;
-								}
-								
-								$("#accountcode").val(node.accountnumber);
-								$("#invoiceaddress").val(invoiceaddress);
-								$("#deliveryaddress").val(deliveryaddress);
-							}
-						},
-						false
-					);
+			
+			showHeader();
 			
 			callAjax(
 					"finddata.php", 
@@ -223,11 +223,16 @@
 			var currentItem = -1;
 			var itemArray = [];
 			
-			function customerid_onchange() {
+			function showHeader() {
 				callAjax(
 						"finddata.php", 
 						{ 
-							sql: "SELECT A.*, B.discount FROM <?php echo $_SESSION['DB_PREFIX'];?>customer A LEFT OUTER JOIN <?php echo $_SESSION['DB_PREFIX'];?>discountband B ON B.id = A.discountbandid WHERE A.id = " + $("#customerid").val()
+							sql: "SELECT A.*, B.id AS clientid, B.customerid, B.invoiceaddress1, B.invoiceaddress2, " +
+								 "B.invoiceaddress3, B.invoicecity, B.invoicepostcode " +
+								 "FROM <?php echo $_SESSION['DB_PREFIX'];?>customerclientsite A " +
+								 "INNER JOIN <?php echo $_SESSION['DB_PREFIX'];?>customerclient B " +
+								 "ON B.id = A.clientid " +
+								 "WHERE A.id = " + $("#siteid").val()
 						},
 						function(data) {
 							if (data.length > 0) {
@@ -251,14 +256,55 @@
 									deliveryaddress = invoiceaddress;
 								}
 								
-								$("#accountcode").val(node.accountnumber);
 								$("#invoiceaddress").val(invoiceaddress);
 								$("#deliveryaddress").val(deliveryaddress);
-								$("#discount").val(new Number(node.discount).toFixed(2));
+								
+								$("#customerid").val(node.customerid);
+								$("#clientid").val(node.clientid);
 							}
 						},
 						false
 					);
+			}
+			
+			function customerid_onchange() {
+				$.ajax({
+						url: "createclientcombo.php",
+						dataType: 'html',
+						async: false,
+						data: {
+							customerid: $("#customerid").val()
+						},
+						type: "POST",
+						error: function(jqXHR, textStatus, errorThrown) {
+							alert(errorThrown);
+						},
+						success: function(data) {
+							$("#clientid").html(data).trigger("change");
+						}
+					});
+			}
+			
+			function clientid_onchange() {
+				$.ajax({
+						url: "createclientsitecombo.php",
+						dataType: 'html',
+						async: false,
+						data: {
+							clientid: $("#clientid").val()
+						},
+						type: "POST",
+						error: function(jqXHR, textStatus, errorThrown) {
+							alert(errorThrown);
+						},
+						success: function(data) {
+							$("#siteid").html(data).trigger("change");
+						}
+					});
+			}
+			
+			function siteid_onchange() {
+				showHeader();
 			}
 			
 			function total_onchange() {
@@ -348,8 +394,8 @@
 				$("#item_linetotal").val(new Number(total).toFixed(2));
 			}
 			
-			function printQuote(id) {
-				window.open("quotereport.php?id=" + id);
+			function printOrder(id) {
+				window.open("orderreport.php?id=" + id);
 			}
 			
 			function populateTable(data) {
@@ -551,6 +597,8 @@
 					function() {
 						$("#item_productid").change(productid_onchange);
 						$("#customerid").change(customerid_onchange);
+						$("#clientid").change(clientid_onchange);
+						$("#siteid").change(siteid_onchange);
 						
 						$("#invoiceitemdialog").dialog({
 								modal: true,
@@ -586,7 +634,7 @@
 			function accept(id) {
 				currentID = id;
 				
-				$("#confirmacceptdialog .confirmdialogbody").html("You are about to accept this order.<br>Are you sure ?");
+				$("#confirmacceptdialog .confirmdialogbody").html("You are about to invoice this order.<br>Are you sure ?");
 				$("#confirmacceptdialog").dialog("open");
 			}
 			
@@ -641,12 +689,16 @@
 	$crud->title = "Orders";
 	$crud->onClickCallback = "checkStatus";
 	$crud->table = "{$_SESSION['DB_PREFIX']}order";
-	$crud->sql = "SELECT A.*, B.name AS customername, C.fullname AS takenbyname
+	$crud->sql = "SELECT A.*, B.name AS sitename, C.fullname AS takenbyname, D.name AS clientname, E.name AS customername
 				  FROM  {$_SESSION['DB_PREFIX']}order A
-				  INNER JOIN  {$_SESSION['DB_PREFIX']}customer B
-				  ON B.id = A.customerid
-				  INNER JOIN  {$_SESSION['DB_PREFIX']}members C
+				  INNER JOIN  {$_SESSION['DB_PREFIX']}customerclientsite B
+				  ON B.id = A.siteid
+				  LEFT OUTER JOIN  {$_SESSION['DB_PREFIX']}members C
 				  ON C.member_id = A.takenbyid
+				  INNER JOIN  {$_SESSION['DB_PREFIX']}customerclient D
+				  ON D.id = B.clientid
+				  INNER JOIN  {$_SESSION['DB_PREFIX']}customer E
+				  ON E.id = D.customerid
 				  ORDER BY A.id DESC";
 	$crud->columns = array(
 			array(
@@ -672,14 +724,28 @@
 				'label' 	 => 'Order Number'
 			),
 			array(
-				'name'       => 'customerid',
+				'name'       => 'customername',
+				'length' 	 => 20,
+				'editable'	 => false,
+				'bind'	  	 => false,
+				'label' 	 => 'Customer'
+			),			
+			array(
+				'name'       => 'clientname',
+				'length' 	 => 20,
+				'editable'	 => false,
+				'bind'	  	 => false,
+				'label' 	 => 'Customer Client'
+			),			
+			array(
+				'name'       => 'siteid',
 				'type'       => 'LAZYDATACOMBO',
-				'length' 	 => 60,
-				'label' 	 => 'Customer',
-				'table'		 => 'customer',
+				'length' 	 => 30,
+				'label' 	 => 'Site',
+				'table'		 => 'customerclientsite',
 				'required'	 => true,
 				'table_id'	 => 'id',
-				'alias'		 => 'customername',
+				'alias'		 => 'sitename',
 				'table_name' => 'name'
 			),
 			array(
@@ -703,15 +769,10 @@
 				'label' 	 => 'Conversion Date'
 			),
 			array(
-				'name'       => 'yourordernumber',
-				'length' 	 => 20,
-				'label' 	 => 'Your Order Number'
-			),			
-			array(
 				'name'       => 'status',
 				'type'		 => 'CHECKBOX',
 				'length' 	 => 10,
-				'label' 	 => 'Accepted'
+				'label' 	 => 'Invoiced'
 			),			
 			array(
 				'name'       => 'takenbyid',
@@ -752,7 +813,7 @@
 				'script' 	  => 'editDocuments'
 			),
 			array(
-				'title'		  => 'Accept',
+				'title'		  => 'Invoice',
 				'id'		  => 'acceptbutton',
 				'imageurl'	  => 'images/accept.png',
 				'script' 	  => 'accept'
@@ -766,7 +827,7 @@
 			array(
 				'title'		  => 'Print',
 				'imageurl'	  => 'images/print.png',
-				'script' 	  => 'printQuote'
+				'script' 	  => 'printOrder'
 			)
 		);
 		

@@ -1,4 +1,9 @@
 <?php 
+	if (strpos($_SERVER['HTTP_USER_AGENT'], "iPhone")) {
+		header("location: m.system-login.php");
+		exit();
+	}
+
 	require_once("system-header.php"); 
 	require_once("confirmdialog.php");
 	

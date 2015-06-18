@@ -2,7 +2,7 @@
 	include("system-embeddedheader.php"); 
 ?>
 <br>
-<h4>Order <?php echo $_GET['orderid']; ?> has been processed.</h4>
+<h4>Order <?php echo getSiteConfigData()->bookingprefix . sprintf("%06d", $_GET['orderid']); ?> has been processed.</h4>
 <br>
 <a href="onlineordering.php">Create New Order</a>
 <?php
