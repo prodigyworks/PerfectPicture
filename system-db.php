@@ -924,7 +924,7 @@ function login($login, $password, $redirect = true) {
 	}
 	
 	//Create query
-	$qry = "SELECT DISTINCT A.*, B.name " .
+	$qry = "SELECT DISTINCT A.*, B.imageid AS customerlogoid, B.name " .
 		   "FROM {$_SESSION['DB_PREFIX']}members A " .
 		   "LEFT OUTER JOIN {$_SESSION['DB_PREFIX']}customer B " .
 		   "ON B.id = A.customerid " .
@@ -945,6 +945,7 @@ function login($login, $password, $redirect = true) {
 			$_SESSION['SESS_LAST_NAME'] = $member['lastname'];
 			$_SESSION['SESS_CUSTOMER_ID'] = $member['customerid'];
 			$_SESSION['SESS_CUSTOMER_NAME'] = $member['name'];
+			$_SESSION['SESS_CUSTOMER_IMAGE_ID'] = $member['customerlogoid'];
 			
 			unset($_SESSION['SESS_CLIENT_ID']);
 			unset($_SESSION['SESS_CLIENT_SITE_ID']);

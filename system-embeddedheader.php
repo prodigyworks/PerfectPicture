@@ -75,10 +75,7 @@
 				</div>
 				
 				<div style="width:375px; text-align:center">
-					<img height=40 src="images/logomain2.png"/>
-				</div>
-				<div style="width:375px;text-align:center">
-					<h5><?php echo $_SESSION['SESS_CUSTOMER_NAME']; ?></h5>
+					<img height=40 src="system-imageviewer.php?id=<?php echo $_SESSION['SESS_CUSTOMER_IMAGE_ID']; ?>"/>
 				</div>
 				<hr>
 
