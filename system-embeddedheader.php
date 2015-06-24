@@ -74,9 +74,15 @@
 					<a href="system-logout.php">Log Out</a>
 				</div>
 				
+<?php 
+	if (isset($_SESSION['SESS_CLIENT_ID'])) {
+?>
 				<div style="width:375px; text-align:center">
 					<img height=40 src="system-imageviewer.php?id=<?php echo $_SESSION['SESS_CUSTOMER_IMAGE_ID']; ?>"/>
 				</div>
+<?php 
+	}
+?>
 				<hr>
 
 			

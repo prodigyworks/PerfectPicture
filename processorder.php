@@ -1,5 +1,6 @@
 <?php 
 	include("system-db.php"); 
+	require('orderreportlib.php');
 	
 	start_db();
 
@@ -74,10 +75,15 @@
 		}
 	}
 	
+	
+	$file = "uploads/order-" . session_id() . "-" . $orderid . ".pdf";
+	$pdf = new OrderReport( 'P', 'mm', 'A4', $orderid);
+	$pdf->Output($file, "F");
+	
 	mysql_query("COMMIT");
 	
 	sendRoleMessage("JRM", "Confirmed order", "Confirmed order ........");
-	sendSiteMessage($siteid, "Confirmed customer order", "Confirmed order ........");
+	sendSiteMessage($siteid, "Confirmed customer order", "Confirmed order ........", array($file));
 	
 	header("location: processorderconfirm.php?orderid=$orderid");
 ?>

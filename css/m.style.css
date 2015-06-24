@@ -9,11 +9,11 @@
 }
 
 #orderform td input {
-	font-size:9px;
+	font-size:11px;
 }
 
-#orderform #submitbutton {
-	padding:15px;
+#orderform .submitbutton {
+	padding:5px;
 	font-size:14px;
 	margin-top: 14px;
 }
@@ -21,7 +21,7 @@
 #orderform .header td {
 	font-style: italic;
 	font-weight: bold;
-	font-size: 9px;
+	font-size: 11px;
 }
 
 #orderform td {
@@ -29,7 +29,7 @@
 }
 
 .favourite div {
-	font-size: 8px ! important;
+	font-size: 12px ! important;
 	font-weight: bold;
 }
 
@@ -69,6 +69,8 @@ html, body {
 }
 
 #loginForm {
+	width:100%;
+	text-align: center;
 	background-position-y: -80;
 }
 
@@ -95,8 +97,9 @@ input[readonly], textarea[readonly], select[readonly] {
 .title {
 	position: absolute;
 	width:160px;
-	font-size:10px;
-	top: 0px;
+	padding: 2px;
+	font-size:12px;
+	top: 2px;
 }
 .logout a {
 	text-decoration: none;
@@ -105,8 +108,9 @@ input[readonly], textarea[readonly], select[readonly] {
 	text-align:right;
 	position: absolute;
 	width:375px;
-	font-size:10px;
-	top: 0px;
+	padding: 2px;
+	font-size:12px;
+	top: 2px;
 }
 
 #loginForm {

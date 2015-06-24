@@ -1,7 +1,7 @@
 <?php include("system-embeddedheader.php"); ?>
 <div id="orderapp">
 	<form id="orderform" method="POST" action="processorder.php">
-		<table width='100%' cellspacing=0 cellpadding=0>
+		<table width='100%' cellspacing=0 cellpadding=0 id="ordertable">
 			<tr class="header">
 				<td>Product</td>
 				<td>Qty</td>
@@ -40,23 +40,39 @@
 		logError($sql . " - " . mysql_error());
 	}
 	
-	for (; $row < 20; $row++) {
-?>
-			<tr>
-				<td>
-					<?php createLazyCombo("productid" . $row, "id", "description", "{$_SESSION['DB_PREFIX']}product", "", false, 55	, "productid[]"); ?>
-				</td>
-				<td>
-					<input type="number" id="qty" name="qty[]" value="" size=5  style="width:40px" />
-				</td>
-			</tr>
-<?php
-	}
 ?>
 		</table>
-		<input id="submitbutton" type="button" onclick="processorder()" value="Process"></input>
+		<br>
+		<input class="submitbutton" type="button" onclick="addProductRow()" value="Add Product"></input>
+		<br>
+		<input class="submitbutton" type="button" onclick="processorder()" value="Process"></input>
 	</form>
 	<script>
+	$(document).ready(
+			function() {
+				addProductRow();
+			}
+		);
+	
+	function addProductRow() {
+		$.ajax({
+				url: "addonlineproduct.php",
+				dataType: 'html',
+				async: false,
+				data: {
+					 rowid: $('#ordertable tr:last').index() + 1 
+				},
+				type: "POST",
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(errorThrown);
+				},
+				success: function(data) {
+					$("#ordertable tr:last").after(data);
+					$("#ordertable tr:last input").first().focus();
+				}
+			});
+	}
+	
 	function processorder() {
 		$("#orderform").submit();
 	}
