@@ -13,7 +13,7 @@
 			)
 			VALUES
 			(
-				$siteid, CURDATE(), 0, 1, $takenbyid
+				$siteid, NOW(), 0, 1, $takenbyid
 			)";
 				
 	$result = mysql_query($sql);
@@ -74,16 +74,15 @@
 			logError($sql . " = " . mysql_error());
 		}
 	}
-	
-	
+
 	$file = "uploads/order-" . session_id() . "-" . $orderid . ".pdf";
 	$pdf = new OrderReport( 'P', 'mm', 'A4', $orderid);
 	$pdf->Output($file, "F");
 	
 	mysql_query("COMMIT");
 	
-	sendRoleMessage("JRM", "Confirmed order", "Confirmed order ........");
-	sendSiteMessage($siteid, "Confirmed customer order", "Confirmed order ........", array($file));
+	sendRoleMessage("JRM", "Confirmed order", "Confirmed order ........", array($file));
 	
+	sendCustomerMessage(getLoggedOnCustomerID(), "Confirmed customer order", "Your order has been sent at " . date("d/m/Y h:i:sa"), array($file));
 	header("location: processorderconfirm.php?orderid=$orderid");
 ?>

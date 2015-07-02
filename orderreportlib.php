@@ -9,8 +9,7 @@
 		function newPage() {
 			$this->AddPage();
 			
-			$this->DynamicImage($this->headermember['imageid'], 135.6, 10);
-	//		$this->Image("images/logomain.png", 135.6, 10);
+			$this->Image("images/logomain.png", 135.6, 10);
 			
 			$this->addText( 15, 13, "JRM Facility Services Ltd", 12, 4, 'B') + 5;
 			$this->addText(15, 20, getSiteConfigData()->address, 8, 3) + 9.5;

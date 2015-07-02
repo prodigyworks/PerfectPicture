@@ -328,7 +328,7 @@ function sendCustomerMessage($customerid, $subject, $message, $attachments = arr
 		logError($qry . " - " . mysql_error());
 	}
 	
-	if (!empty($error)) echo $error;
+//	if (!empty($error)) echo $error;
 }
 
 
@@ -709,7 +709,7 @@ function redirectWithoutRole($role, $location) {
 }
 
 function getEmailHeader() {
-	return "<img src='" . getSiteConfigData()->domainurl . "/images/SmallLogo.png' />";
+	return "<img src='" . getSiteConfigData()->domainurl . "/images/logomain2.png' />";
 }
 
 function getEmailFooter() {

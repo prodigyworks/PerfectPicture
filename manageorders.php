@@ -760,7 +760,7 @@
 			),			
 			array(
 				'name'       => 'orderdate',
-				'length' 	 => 12,
+				'length' 	 => 18,
 				'datatype'   => 'date',
 				'label' 	 => 'Order Date'
 			),
