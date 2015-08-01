@@ -44,10 +44,10 @@
 		        $index = 0;
 		        
 		        $productcode = mysql_escape_string($data[0]);
-		        $description = mysql_escape_string($data[2]);
+		        $description = mysql_escape_string($data[1]);
 		        		        
 		        if ($data[0] != "") {
-		        	echo "<div>Product: $productcode</div>";
+//		        	echo "<div>Product: $productcode</div>";
 		        	
 					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}product 
 							(
@@ -60,8 +60,12 @@
 							
 					$result = mysql_query($qry);
         	
-					if (mysql_errno() != 1062 && mysql_errno() != 0 ) {
-						logError(mysql_error() . " : " .  $qry);
+					if (! $result) {
+						if (mysql_errno() != 1062) {
+							logError(mysql_error() . " : " .  $qry);
+						} else {
+							echo "<h5>Duplicate : $productcode</h5>";
+						}
 					}
 		        }
 		    }

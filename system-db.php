@@ -897,7 +897,7 @@ function createUserCombo($id, $where = " ", $required = true, $isarray = false, 
 	<?php
 }
 
-function login($login, $password, $redirect = true) {
+function login($login, $password, $redirect = true, $mobile = true) {
 	//Array to store validation errors
 	$errmsg_arr = array();
 	
@@ -923,14 +923,29 @@ function login($login, $password, $redirect = true) {
 		$errflag = true;
 	}
 	
+	$md5passwd = md5($password);
+	
 	//Create query
-	$qry = "SELECT DISTINCT A.*, B.imageid AS customerlogoid, B.name " .
-		   "FROM {$_SESSION['DB_PREFIX']}members A " .
-		   "LEFT OUTER JOIN {$_SESSION['DB_PREFIX']}customer B " .
-		   "ON B.id = A.customerid " .
-		   "WHERE A.login = '$login' " .
-		   "AND A.passwd = '" . md5($password) . "' " .
-		   	"AND A.accepted = 'Y'";
+	if ($mobile) {
+		$qry = "SELECT DISTINCT A.*, B.imageid AS customerlogoid, B.name 
+			    FROM {$_SESSION['DB_PREFIX']}members A 
+			    LEFT OUTER JOIN {$_SESSION['DB_PREFIX']}customer B 
+			    ON B.id = A.customerid 
+			    WHERE A.login = '$login' 
+			    AND A.passwd = '$md5passwd' 
+			   	AND A.accepted = 'Y'";
+		
+	} else {
+		$qry = "SELECT DISTINCT A.*, B.imageid AS customerlogoid, B.name 
+			    FROM {$_SESSION['DB_PREFIX']}members A 
+			    LEFT OUTER JOIN {$_SESSION['DB_PREFIX']}customer B 
+			    ON B.id = A.customerid 
+			    WHERE A.login = '$login' 
+			    AND A.passwd = '$md5passwd' 
+			   	AND A.accepted = 'Y'
+			   	AND A.member_id IN (SELECT C.memberid FROM {$_SESSION['DB_PREFIX']}userroles C WHERE C.roleid = 'ADMIN')";
+	}
+	
 	$result = mysql_query($qry);
 	
 	//Check whether the query was successful or not
@@ -1016,6 +1031,8 @@ function login($login, $password, $redirect = true) {
 			}
 			
 		} else {
+		
+		logError($qry, false);
 			//If there are input validations, redirect back to the login form
 			if (! $errflag) {
 //				$errmsg_arr[] = "Login not found / Not active.<br>Please register or contact portal support";
@@ -1029,8 +1046,8 @@ function login($login, $password, $redirect = true) {
 			exit();
 		}
 		
-	}else {
-		logError("Query failed");
+	} else {
+		logError(mysql_error() . " - $qry");
 	}
 }
 

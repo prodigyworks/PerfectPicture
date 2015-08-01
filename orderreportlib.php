@@ -98,7 +98,7 @@
 				$sql = "SELECT A.*, DATE_FORMAT(A.orderdate, '%d/%m/%Y') AS orderdate,
 						C.name AS clientname, D.name AS customername, D.imageid, D.accountnumber, D.invoiceaddress1, D.invoiceaddress2, D.invoiceaddress3, 
 						D.invoicecity, D.invoicepostcode, B.deliveryaddress1, B.deliveryaddress2, 
-						B.deliveryaddress3, B.deliverycity, B.deliverypostcode, D.firstname, B.lastname,
+						B.deliveryaddress3, B.deliverycity, B.deliverypostcode, D.firstname, D.lastname,
 						E.fullname AS takenbyname
 					    FROM  {$_SESSION['DB_PREFIX']}order A
 					    INNER JOIN  {$_SESSION['DB_PREFIX']}customerclientsite B

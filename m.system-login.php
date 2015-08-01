@@ -38,7 +38,7 @@
 		echo "</div>";
 	}
 ?>
-	<form action="system-login-exec.php?session=<?php echo urlencode($_GET['session']); ?>" method="post" id="loginForm">
+	<form action="m.system-login-exec.php?session=<?php echo urlencode($_GET['session']); ?>" method="post" id="loginForm">
 		<br>
 		<div><label>User name</label></div>
 		<input type="text" name="login" id="login" value="<?php if (isset($_SESSION['ERR_USER'])) echo $_SESSION['ERR_USER']; ?>"/>
