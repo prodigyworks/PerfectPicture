@@ -201,7 +201,7 @@
 			array(
 				'name'       => 'staffname',
 				'type'		 => 'DERIVED',
-				'length' 	 => 60,
+				'length' 	 => 40,
 				'bind'		 => false,
 				'function'   => 'fullName',
 				'sortcolumn' => 'A.firstname',
@@ -209,13 +209,13 @@
 			),
 			array(
 				'name'       => 'firstname',
-				'length' 	 => 30,
+				'length' 	 => 25,
 				'showInView' => false,
 				'label' 	 => 'First Name'
 			),
 			array(
 				'name'       => 'lastname',
-				'length' 	 => 30,
+				'length' 	 => 25,
 				'showInView' => false,
 				'label' 	 => 'Last Name'
 			),
@@ -225,7 +225,7 @@
 				'length' 	 => 60,
 				'label' 	 => 'Customer',
 				'table'		 => 'customer',
-				'required'	 => true,
+				'required'	 => false,
 				'table_id'	 => 'id',
 				'alias'		 => 'customername',
 				'table_name' => 'name'

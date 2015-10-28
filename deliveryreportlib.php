@@ -74,7 +74,6 @@
 				$this->addText(55, $dynamicY + 38, "This is Delivery Note No " . $this->headermember['revision'] . " and Supersedes all Previous Issues", 8, 3.5, 'B');
 			}
 			
-			$this->addText( 10, 270, "VAT Registration No: XXX XXXX XX\nCompany Reg No: XXXXXXXX", 7, 3);
 			$this->addText( 170, 270, "Printed: " . date("d/m/Y H:i"), 7, 3);
 			$this->addText( 186, 273, "Page " . $this->PageNo() . " of {nb}", 7, 3);
 			

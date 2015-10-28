@@ -93,11 +93,13 @@
 			}
 		}
 		
+		$fullname = $fname . " " . $lname;
+		
 		//Create INSERT query
 		$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}members " .
-				"(firstname, lastname, login, passwd, email, imageid, accepted, guid, status, customerid, metacreateddate, metacreateduserid, metamodifieddate, metamodifieduserid) " .
+				"(firstname, lastname, fullname, login, passwd, email, imageid, accepted, guid, status, customerid, metacreateddate, metacreateduserid, metamodifieddate, metamodifieduserid) " .
 				"VALUES" .
-				"('$fname','$lname','$login', '".md5($_POST['password'])."', '$email', $imageid, 'Y', '$guid', 'Y', $customerid, NOW(), " . getLoggedOnMemberID() . ", NOW(), " .  getLoggedOnMemberID() . ")";
+				"('$fname','$lname', '$fullname', $login', '".md5($_POST['password'])."', '$email', $imageid, 'Y', '$guid', 'Y', $customerid, NOW(), " . getLoggedOnMemberID() . ", NOW(), " .  getLoggedOnMemberID() . ")";
 		$result = @mysql_query($qry);
 		$memberid = mysql_insert_id();
 		

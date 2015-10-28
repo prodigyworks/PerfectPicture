@@ -6,10 +6,96 @@
 		/* Post header event. */
 		public function postHeaderEvent() {
 			createDocumentLink();
+?>
+			<script src='js/jquery.picklists.js' type='text/javascript'></script>
+			
+			<div id="userDialog" class="modal">
+				<form id="usersForm" name="usersForm" method="post">
+					<input type="hidden" id="siteid" name="siteid" />
+					<input type="hidden" id="usercmd" name="usercmd" value="X" />
+					<select class="listpicker" name="users[]" multiple="true" id="users" >
+						<?php createComboOptions("member_id", "fullname", "{$_SESSION['DB_PREFIX']}members", "WHERE customerid IS NOT NULL AND customerid != 0", false); ?>
+					</select>
+				</form>
+			</div>
+<?php
+		}
+		
+		/* Pre command event. */
+		public function preCommandEvent() {
+			if (isset($_POST['usercmd'])) {
+				if (isset($_POST['users'])) {
+					$counter = count($_POST['users']);
+		
+				} else {
+					$counter = 0;
+				}
+				
+				$siteid = $_POST['siteid'];
+				$loggedinid = getLoggedOnMemberID();
+				
+				$qry = "DELETE FROM {$_SESSION['DB_PREFIX']}customerclientsiteuser 
+					WHERE siteid = $siteid";
+				$result = mysql_query($qry);
+				
+				if (! $result) {
+					logError(mysql_error());
+				}
+		
+				for ($i = 0; $i < $counter; $i++) {
+					$memberid = $_POST['users'][$i];
+					
+					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}customerclientsiteuser 
+						(
+							memberid, siteid, 
+							metacreateddate, metacreateduserid, 
+							metamodifieddate, metamodifieduserid
+						) 
+						VALUES 
+						(
+							$memberid, $siteid, 
+							NOW(), $loggedinid, 
+							NOW(), $loggedinid
+						)";
+					$result = mysql_query($qry);
+				};
+			}
 		}
 		
 		public function postScriptEvent() {
 ?>
+			$(document).ready(
+					function() {
+						$("#users").pickList({
+								removeText: 'Remove User',
+								addText: 'Add User',
+								testMode: false
+							});
+						
+						$("#userDialog").dialog({
+								autoOpen: false,
+								modal: true,
+								width: 800,
+								title: "Users",
+								buttons: {
+									Ok: function() {
+										$("#usersForm").submit();
+									},
+									Cancel: function() {
+										$(this).dialog("close");
+									}
+								}
+							});
+					}
+				);
+				
+			function userSites(siteid) {
+				getJSONData('findusersites.php?siteid=' + siteid, "#users", function() {
+					$("#siteid").val(siteid);
+					$("#userDialog").dialog("open");
+				});
+			}
+			
 			function editDocuments(node) {
 				viewDocument(node, "addcustomerdocument.php", node, "customerdocs", "customerid");
 			}
@@ -18,11 +104,11 @@
 			function fullDeliveryAddress(node) {
 				var address = "";
 				
-				if ((node.deliveryaddress1) != "") {
+				if ((node.deliveryaddress1) != "" && (node.deliveryaddress1) != null) {
 					address = address + node.deliveryaddress1;
 				} 
 				
-				if ((node.deliveryaddress2) != "") {
+				if ((node.deliveryaddress2) != "" && (node.deliveryaddress2) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -30,7 +116,7 @@
 					address = address + node.deliveryaddress2;
 				} 
 				
-				if ((node.deliveryaddress3) != "") {
+				if ((node.deliveryaddress3) != "" && (node.deliveryaddress3) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -38,7 +124,7 @@
 					address = address + node.deliveryaddress3;
 				} 
 				
-				if ((node.deliverycity) != "") {
+				if ((node.deliverycity) != "" && (node.deliverycity) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -46,7 +132,7 @@
 					address = address + node.deliverycity;
 				} 
 				
-				if ((node.deliverypostcode) != "") {
+				if ((node.deliverypostcode) != "" && (node.deliverypostcode) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -54,7 +140,7 @@
 					address = address + node.deliverypostcode;
 				} 
 				
-				if ((node.deliverycountry) != "") {
+				if ((node.deliverycountry) != "" && (node.deliverycountry) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -193,6 +279,11 @@
 		);
 
 	$crud->subapplications = array(
+			array(
+				'title'		  => 'Users',
+				'imageurl'	  => 'images/user.png',
+				'script' 	  => 'userSites'
+			),
 			array(
 				'title'		  => 'Documents',
 				'imageurl'	  => 'images/document.gif',

@@ -1,5 +1,6 @@
 <?php 
-	if (strpos($_SERVER['HTTP_USER_AGENT'], "iPhone")) {
+	if (strpos($_SERVER['HTTP_USER_AGENT'], "iPhone") ||
+		strpos($_SERVER['HTTP_USER_AGENT'], "Archos ")) {
 		header("location: m.system-login.php");
 		exit();
 	}

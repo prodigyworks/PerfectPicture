@@ -1,4 +1,15 @@
-<?php include("system-embeddedheader.php"); ?>
+<?php 
+	include("system-embeddedheader.php"); 
+	
+	function removeFrequentProduct() {
+		$id = $_POST['pk1'];
+		$sql = "DELETE FROM {$_SESSION['DB_PREFIX']}frequentproducts WHERE id = $id";
+		
+		if (! mysql_query($sql)) {
+			logError($sql . " - " . mysql_error());
+		}
+	}
+?>
 <div id="orderapp">
 	<form id="orderform" method="POST" action="processorder.php">
 		<table width='100%' cellspacing=0 cellpadding=0 id="ordertable">
@@ -32,6 +43,9 @@
 				<td>
 					<input type="number" id="qty" name="qty[]" size=5 value="" style="width:40px" />
 				</td>
+				<td>
+					<input type="button" class="btnRemove" value="x" style="width:12px" frequentid="<?php echo $member['id']; ?>" />
+				</td>
 			</tr>
 <?php
 		}
@@ -51,6 +65,12 @@
 	$(document).ready(
 			function() {
 				addProductRow();
+
+				$(".btnRemove").click(
+						function() {
+							call("removeFrequentProduct", {pk1: $(this).attr("frequentid")});
+						}
+					);
 			}
 		);
 	

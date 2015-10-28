@@ -6,5 +6,6 @@
 	$_SESSION['SESS_CLIENT_ID'] = $_POST['clientid'];
 	$_SESSION['SESS_CLIENT_SITE_ID'] = $_POST['siteid'];
 	
-	header("location: index.php");
+	header("location: onlineordering.php?ts=" . time());
+	exit();
 ?>

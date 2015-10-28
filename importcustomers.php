@@ -33,112 +33,69 @@
 		
 		$subcat1 = "";
 		$row = 1;
+		$calabash = 37288;
 		
 		if (($handle = fopen($_FILES['customerfile']['tmp_name'], "r")) !== FALSE) {
 		    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-		        if ($row++ == 1) {
-		        	continue;
-		        }
-		        
 		        $num = count($data);
 		        $index = 0;
 		        
-		        $customerteam = mysql_escape_string($data[$index++]);
-		        $owner = mysql_escape_string($data[$index++]);
-		        $accountnumber = mysql_escape_string($data[$index++]);
-		        $name = mysql_escape_string($data[$index++]);
-		        $firstname = mysql_escape_string($data[$index++]);
-                $lastname = mysql_escape_string($data[$index++]);
-		        $invoiceaddress1 = mysql_escape_string($data[$index++]);
-		        $invoiceaddress2 = mysql_escape_string($data[$index++]);
-		        $invoiceaddress3 = mysql_escape_string($data[$index++]);
-		        $invoicecity = mysql_escape_string($data[$index++]);
-		        $invoicecounty = mysql_escape_string($data[$index++]);
-		        $invoicepostcode = mysql_escape_string($data[$index++]);
-		        $invoicecountry = mysql_escape_string($data[$index++]);
-		        $email1 = mysql_escape_string($data[$index++]);
-		        $telephone1 = mysql_escape_string($data[$index++]);
-		        $fax1 = mysql_escape_string($data[$index++]);
-		        $deliverymethod = mysql_escape_string($data[$index++]);
-		        $deliveryaddress1 = mysql_escape_string($data[$index++]);
-		        $deliveryaddress2 = mysql_escape_string($data[$index++]);
-		        $deliveryaddress3 = mysql_escape_string($data[$index++]);
-		        $deliverycity = mysql_escape_string($data[$index++]);
-		        $deliverycounty = mysql_escape_string($data[$index++]);
-		        $deliverypostcode = mysql_escape_string($data[$index++]);
-		        $deliverycountry = mysql_escape_string($data[$index++]);
-		        $email2 = mysql_escape_string($data[$index++]);
-		        $telephone2 = mysql_escape_string($data[$index++]);
+		        $clientname = mysql_escape_string($data[$index++]);
+		        $street = mysql_escape_string($data[$index++]);
+		        $city = mysql_escape_string($data[$index++]);
+		        $postcode = mysql_escape_string($data[$index++]);
 		        		        
 		        if ($data[3] != "") {
-		        	echo "<div>Customer: $name</div>";
+		        	echo "<div>Customer: $clientname - $street</div>";
 		        	
-					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}customerteam " .
-							"(name) " .
-							"VALUES " .
-							"('$customerteam')";
-							
-					$result = mysql_query($qry);
-		        	$teamid =  mysql_insert_id();
-        	
-					if (mysql_errno() == 1062) {
-						$qry = "SELECT id " .
-								"FROM {$_SESSION['DB_PREFIX']}customerteam " .
-								"WHERE name = '$customerteam'";
-						$result = mysql_query($qry);
-						
-						//Check whether the query was successful or not
-						if ($result) {
-							while (($member = mysql_fetch_assoc($result))) {
-								$teamid = $member['id'];
-							}
-						}
-					}
-					
-					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}deliverymethod " .
-							"(name) " .
-							"VALUES " .
-							"('$deliverymethod')";
-							
-					$result = mysql_query($qry);
-		        	$deliverymethodid =  mysql_insert_id();
-        	
-					if (mysql_errno() == 1062) {
-						$qry = "SELECT id " .
-								"FROM {$_SESSION['DB_PREFIX']}customerteam " .
-								"WHERE name = '$deliverymethod'";
-						$result = mysql_query($qry);
-						
-						//Check whether the query was successful or not
-						if ($result) {
-							while (($member = mysql_fetch_assoc($result))) {
-								$deliverymethodid = $member['id'];
-							}
-						}
-					}
-		        
-					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}customer 
+					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}customerclient
 							(
-							owner, customerteamid, accountnumber, name, firstname, lastname, 
-							invoiceaddress1, invoiceaddress2, invoiceaddress3, invoicecity, 
-							invoicepostcode, email1, telephone1, fax1,
-							deliverymethodid, deliveryaddress1, deliveryaddress2, 
-							deliveryaddress3, deliverycity, deliverypostcode, email2, telephone2
-							)  
-							VALUES  
+								customerid, name, accountnumber
+							) 
+							VALUES 
 							(
-							'$owner', $teamid, '$accountnumber', '$name', '$firstname', '$lastname', 
-							'$invoiceaddress1', '$invoiceaddress2', '$invoiceaddress3', '$invoicecity', 
-							'$invoicepostcode', '$email1', '$telephone1', '$fax1', 
-							$deliverymethodid, '$deliveryaddress1', '$deliveryaddress2', 
-							'$deliveryaddress3', '$deliverycity', '$deliverypostcode', '$email2', '$telephone2'
+								$calabash, '$clientname', '$clientname'
 							)";
 							
 					$result = mysql_query($qry);
         	
-					if (mysql_errno() != 1062 && mysql_errno() != 0 ) {
-						logError(mysql_error() . " : " .  $qry);
-					}
+		        	if (! $result) {
+						if (mysql_errno() != 1062) {
+							logError($qry . " - " . mysql_error());
+						}
+						
+						$qry = "SELECT id 
+								FROM {$_SESSION['DB_PREFIX']}customerclient 
+								WHERE name = '$clientname'";
+						
+						$result = mysql_query($qry);
+						
+						if($result) {
+							while (($member = mysql_fetch_assoc($result))) {
+								$clientid = $member['id'];
+							}
+						}
+						
+		        	} else {
+			        	$clientid =  mysql_insert_id();
+		        	}
+		        	
+					$qry = "INSERT INTO {$_SESSION['DB_PREFIX']}customerclientsite
+							(
+								clientid, name, deliveryaddress1, deliverycity, deliverypostcode
+							) 
+							VALUES 
+							(
+								$clientid, '$street', '$street', '$city', '$postcode'
+							)";
+							
+					$result = mysql_query($qry);
+								
+		        	if (! $result) {
+						if (mysql_errno() != 1062) {
+							logError($qry . " - " . mysql_error());
+						}
+		        	}
 		        }
 		    }
 		    

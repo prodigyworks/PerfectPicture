@@ -18,11 +18,11 @@
 			function fullInvoiceAddress(node) {
 				var address = "";
 				
-				if ((node.invoiceaddress1) != "") {
+				if ((node.invoiceaddress1) != "" && (node.invoiceaddress1) != null) {
 					address = address + node.invoiceaddress1;
 				} 
 				
-				if ((node.invoiceaddress2) != "") {
+				if ((node.invoiceaddress2) != "" && (node.invoiceaddress2) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -30,7 +30,7 @@
 					address = address + node.invoiceaddress2;
 				} 
 				
-				if ((node.invoiceaddress3) != "") {
+				if ((node.invoiceaddress3) != "" && (node.invoiceaddress3) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -38,7 +38,7 @@
 					address = address + node.invoiceaddress3;
 				} 
 				
-				if ((node.invoicecity) != "") {
+				if ((node.invoicecity) != "" && (node.invoicecity) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -46,7 +46,7 @@
 					address = address + node.invoicecity;
 				} 
 				
-				if ((node.invoicepostcode) != "") {
+				if ((node.invoicepostcode) != "" && (node.invoicepostcode) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
@@ -54,7 +54,7 @@
 					address = address + node.invoicepostcode;
 				} 
 				
-				if ((node.invoicecountry) != "") {
+				if ((node.invoicecountry) != "" && (node.invoicecountry) != null) {
 					if (address != "") {
 						address = address + ", ";
 					}
